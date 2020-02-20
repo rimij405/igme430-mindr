@@ -1,0 +1,52 @@
+{
+    "cards": [
+        {
+            "cardID": "Card0001",
+            "author": "iae2784",
+            "keywords": ["example"],
+            "prompt": {
+                "isImage": "no",
+                "data": "This is a string prompt."
+            },
+            "answer": {
+                "data": "This is the answer."
+            },
+            "analytics": {
+                "correct": 0,
+                "incorrect": 0
+            }
+        },
+        {
+            "cardID": "Card0002",
+            "author": "iae2784",
+            "keywords": ["example"],
+            "prompt": {
+                "isImage": "no",
+                "data": "This is a string prompt."
+            },
+            "answer": {
+                "data": "This is the answer."
+            },
+            "analytics": {
+                "correct": 0,
+                "incorrect": 0
+            }
+        },
+        {
+            "cardID": "Card0003",
+            "author": "super",
+            "keywords": ["example"],
+            "prompt": {
+                "isImage": "yes",
+                "data": "Should be a link to the image."
+            },
+            "answer": {
+                "data": "This is the answer."
+            },
+            "analytics": {
+                "correct": 0,
+                "incorrect": 0
+            }
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "users": [
+        {
+            "username": "iae2784",
+            "password": "test",
+            "plan": "basic",
+            "dateCreated": "2020-02-20T07:30:27.839Z",
+            "dateUpdated": "2020-02-20T07:30:27.839Z"
+        },
+        {
+            "username": "super",
+            "password": "test",
+            "plan": "premium",
+            "dateCreated": "2020-02-20T07:30:27.839Z",
+            "dateUpdated": "2020-02-20T07:30:27.839Z"
+        }
+    ]
+}
