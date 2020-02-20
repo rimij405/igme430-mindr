@@ -1,0 +1,50 @@
+{
+  "name": "mindr",
+  "version": "1.0.0",
+  "description": "Server for study application.",
+  "main": "app.js",
+  "private": true,
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "expect.js": "^0.3.1",
+    "mocha": "^7.0.1"
+  },
+  "scripts": {
+    "pretest": "eslint ./src --fix",
+    "test": "mocha",
+    "build": "webpack",
+    "start": "node ./app.js",
+    "watch-webpack": "webpack --watch",
+    "watch-nodemon": "nodemon --watch ./server --watch ./client/dist ./app.js",
+    "serve": "npm run build && npm run watch-nodemon"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rimij405/igme430-mindr.git"
+  },
+  "keywords": [
+    "study",
+    "test",
+    "memory",
+    "application"
+  ],
+  "author": "Ian Effendi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rimij405/igme430-mindr/issues"
+  },
+  "homepage": "https://github.com/rimij405/igme430-mindr#readme",
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.18.3",
+    "eslint-plugin-react-hooks": "^2.4.0",
+    "nodemon": "^2.0.2",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11"
+  }
+}
