@@ -1,4 +1,4 @@
-const regex = require('./../utils').regex;
+const regex = require('../utils').regex;
 
 // Generalized route.
 // Contains a pattern that gets matched.
