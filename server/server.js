@@ -2,6 +2,7 @@
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
+const Router = require('./routes/router.js');
 
 const index = { name: "index", data: fs.readFileSync(`${__dirname}/../client/public/index.html`) };
 const main = { dir: `${__dirname}/../client/public/css/`, name: `main.css` };
@@ -88,7 +89,8 @@ const routes = {
 // On request to the server, process the route.
 const onRequest = (request, response) => {
     const parsedUrl = url.parse(request.url);
-    const handleRequest = routes[parsedUrl.pathname];
+    const handleRequest = http.router.handle || routes[parsedUrl.pathname];
+
     if(!handleRequest){
         sendNotFound(request, response);
     } else {
@@ -98,9 +100,12 @@ const onRequest = (request, response) => {
 
 // Create the server.
 const createServer = () => {
-    // Create and listen to the server.
-   
     
+    // Create and listen to the server.
+    http.router = new Router();
+    http.router.all("/", (request, response, next) => {
+        console.log("Request sent. Testing.");
+    });
     
     return http.createServer(onRequest);
 };
