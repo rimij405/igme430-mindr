@@ -6,7 +6,7 @@ const createPattern = (path = '/') => {
 };
 
 // Check if a pattern matches.
-const testPattern = (expected = '/', actual = undefined) {
+const testPattern = (expected = '/', actual = undefined) => {
     if(expected != null && expected != undefined) {
         const regexp = createPattern(expected);
         if(actual != null && actual != undefined) {

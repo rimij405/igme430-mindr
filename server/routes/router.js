@@ -49,24 +49,25 @@ Route.prototype.isPath = function(path) {
 
 // Create a request handler stack.
 function RequestHandlerStack(collection = null) {
-  if (collection && Array.isArray(collection)) {
-    this.stack = ArrayUtil.copy(collection);
+    if (collection && Array.isArray(collection)) {
+        this.stack = ArrayUtil.copy(collection);
     if (collection instanceof RequestHandStack) {
-      this.stack = ArrayUtil.copy(collection.stack);
+        this.stack = ArrayUtil.copy(collection.stack);
     } else {
-      this.stack = [];
+        this.stack = [];
     }
-
-    // Additional stack methods.
-    this.push = this.stack.push;
-    this.pop = this.stack.pop;
-    this.clear = this.stack.clear;
   }
 }
 
 ////////////////////
 // RequestHandlerStack CLASS
 ////////////////////
+
+// Push element onto the stack.
+RequestHandlerStack.prototype.push = function(element) {
+    this.stack = this.stack || [];
+    this.stack.push(element);
+}
 
 // Check if element in stack matches method.
 RequestHandlerStack.prototype.verifyMethod = function(
@@ -165,7 +166,7 @@ Router.prototype.register = function(
     // If callback is an array, iterate.
     const router = this;
     callback.forEach(functor => {
-      router.register(method, path, callback);
+      router.register(method, path, functor);
     });
   }
 
@@ -211,8 +212,10 @@ Router.prototype.handle = function(request, response, done) {
     // If missing data, call to function was malformed.
     throw new Error("Function called improperly. Fatal server error.");
   } else {
+
     // Add parsed URL to the request object.
     request.parsedUrl = url.parse(request.url);
+    const router = request.router;
 
     // Reset the indices to -1.
     let index = -1;
@@ -223,9 +226,12 @@ Router.prototype.handle = function(request, response, done) {
       err = null,
       stackPosition = -1,
       errorPosition = -1
-    ) {
-      const requestHandler = this.getRequestHandlerAt(stackPosition);
-      const errorHandler = this.getErrorHandlerAt(errorPosition);
+    ) {        
+
+        console.dir(router);
+
+      const requestHandler = router.getRequestHandlerAt(stackPosition);
+      const errorHandler = router.getErrorHandlerAt(errorPosition);
       index = stackPosition;
       errorIndex = errorPosition;
 

@@ -37,8 +37,8 @@ const atEnd = (arr, index) => {
 
 // Get element and perform an operation if successful.
 const getElement = (arr, index) => {
-    new Promise(resolve = (element, index, array) => {},
-                reject = (err) => {}) {
+    return new Promise((resolve = (element, index, array) => {},
+                reject = (err) => {}) => {
                     if(!arr){
                         reject(new Error(`Array is undefined or null.`));
                     } else if(!Array.isArray(arr)){
@@ -50,11 +50,11 @@ const getElement = (arr, index) => {
                     } else {
                         reject(new Error(`Index out of bounds. Index '${index}' out of range [0, ${arr.length}).`));
                     }
-    }
+                });
 };
 
 // Perform a deep copy of the elements in the array. If recurse is true, sub-arrays will also be deep copied.
-const copy = (arr, recurse = false) {
+const copy = (arr, recurse = false) => {
     if(!arr || !Array.isArray(arr)){
         // If not an array, don't copy it. Return null.
         return null;

@@ -90,6 +90,7 @@ const routes = {
 const onRequest = (request, response) => {
     const parsedUrl = url.parse(request.url);
     const handleRequest = http.router.handle || routes[parsedUrl.pathname];
+    request.router = http.router || {};
 
     if(!handleRequest){
         sendNotFound(request, response);
