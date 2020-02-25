@@ -207,10 +207,12 @@ Router.prototype.delete = function(path = "/", callback = (request, response, ne
 }
 
 // Handle a user request. Done is called when router completes middleware stack execution.
-Router.prototype.handle = function(request, response, done) {
+Router.prototype.handle = function(request, response, done = (err) => {
+  if(err) { console.error(err); }
+}) {
   if (!request || !response) {
     // If missing data, call to function was malformed.
-    throw new Error("Function called improperly. Fatal server error.");
+    done(new Error("Function called improperly. Fatal server error."));
   } else {
 
     // Add parsed URL to the request object.
@@ -235,13 +237,13 @@ Router.prototype.handle = function(request, response, done) {
       index = stackPosition;
       errorIndex = errorPosition;
 
-      if (err && errorIndex === this.errors.stack.length) {
+      if (err && errorIndex === router.errors.stack.length) {
         // If error position has reached the end, and error is not null,
         // return done.
         return done(err);
       }
 
-      if (!err && index === this.middleware.stack.length) {
+      if (!err && index === router.middleware.stack.length) {
         // If stack position has reached the end, return done.
         return done(err);
       }

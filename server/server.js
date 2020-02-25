@@ -89,14 +89,29 @@ const routes = {
 // On request to the server, process the route.
 const onRequest = (request, response) => {
     const parsedUrl = url.parse(request.url);
+
+
     const handleRequest = http.router.handle || routes[parsedUrl.pathname];
     request.router = http.router || {};
 
     if(!handleRequest){
         sendNotFound(request, response);
     } else {
-        handleRequest(request, response);
+        handleRequest(request, response, (err) => {
+            if(err) {
+                console.error(err);
+                response.writeHead(501, err.message || "Server Error", { 'Content-Type': 'application/json' })
+                response.write(JSON.stringify({ message: "router failure."}));
+            } else {
+                console.log("Router complete.");
+                response.writeHead(200, { "Content-Type": "application/json" });
+                response.write(JSON.stringify({ message: "router success."}));
+            }
+            response.end();
+        });
     }
+
+    response.end();
 };
 
 // Create the server.
@@ -104,8 +119,12 @@ const createServer = () => {
     
     // Create and listen to the server.
     http.router = new Router();
-    http.router.all("/", (request, response, next) => {
+    http.router.post("/", (request, response, next) => {
+        console.dir(request);
         console.log("Request sent. Testing.");
+        response.writeHead(200, { 'Content-Type': 'application/json' });
+        response.write(JSON.stringify({ message: "successful callback" }));
+        response.end();
     });
     
     return http.createServer(onRequest);
