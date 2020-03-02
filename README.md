@@ -20,6 +20,16 @@ Steps to develop this project:
 2. Run `npm install` in the root directory.
 3. Run `npm run serve` to serve project with nodemon.
 
+## Attributions
+
+This project uses the following libraries, packages, tools, and resources:
+
+- [Node.JS](https://nodejs.org/en/) - A JavaScript runtime built on [Chrome's V8 JavaScript engine](https://v8.dev/).
+- [npm](https://www.npmjs.com/) - A package manager used for Node.JS projects.
+- [CircleCI](https://circleci.com/) - Continuous integration solution.
+- [milligram](https://milligram.io/) - A lightweight CSS framework.
+- [Heroku](http://heroku.com/) - Deployment solution for server-based applications, websites, services, and projects.
+
 ## Contribution Guidelines
 
 This project is not open to contributions from others at the present moment. If you would like to expand upon this proof-of-concept, the code herein is [licensed](LICENSE) under the permissible MIT license.
