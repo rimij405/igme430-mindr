@@ -1,7 +1,7 @@
-const { pathToRegexp } = require("path-to-regexp");
 const url = require("url");
 const HTTP_METHOD = require("./../utils").methods;
 const ArrayUtil = require("./../utils").array;
+const Route = require("./route.js");
 
 ///////////////////
 // HELPER METHODS
@@ -23,51 +23,26 @@ const routes = {
 };*/
 
 ////////////////////
-// Route CLASS
+// RequestHandlerStack CLASS
 ////////////////////
-
-// The Route maintains reference to a regexp path pattern, method, and middleware function.
-function Route(
-  method = null,
-  path = null,
-  callback = (request, response, next) => {}
-) {
-  this.method = method;
-  this.path = pathToRegexp(path || "*");
-  this.callback = callback;
-}
-
-// Check if route is for specified HTTP Method.
-Route.prototype.isMethod = function(method) {
-  return this.method === HTTP_METHOD.ALL || this.method === method;
-};
-
-// Check if route matches specified path.
-Route.prototype.isPath = function(path) {
-  return path && this.path.match(path);
-};
 
 // Create a request handler stack.
 function RequestHandlerStack(collection = null) {
-    if (collection && Array.isArray(collection)) {
-        this.stack = ArrayUtil.copy(collection);
+  if (collection && Array.isArray(collection)) {
+    this.stack = ArrayUtil.copy(collection);
     if (collection instanceof RequestHandStack) {
-        this.stack = ArrayUtil.copy(collection.stack);
+      this.stack = ArrayUtil.copy(collection.stack);
     } else {
-        this.stack = [];
+      this.stack = [];
     }
   }
 }
 
-////////////////////
-// RequestHandlerStack CLASS
-////////////////////
-
 // Push element onto the stack.
 RequestHandlerStack.prototype.push = function(element) {
-    this.stack = this.stack || [];
-    this.stack.push(element);
-}
+  this.stack = this.stack || [];
+  this.stack.push(element);
+};
 
 // Check if element in stack matches method.
 RequestHandlerStack.prototype.verifyMethod = function(
@@ -177,44 +152,73 @@ Router.prototype.register = function(
 };
 
 // Register under all HTTP methods.
-Router.prototype.all = function(path = "/", callback = (request, response, next) => {}, ...callbacks) {
-    this.register(HTTP_METHOD.ALL, path, callback, callbacks);
-}
+Router.prototype.all = function(
+  path = "/",
+  callback = (request, response, next) => {},
+  ...callbacks
+) {
+  this.register(HTTP_METHOD.ALL, path, callback, callbacks);
+};
 
 // Register under specified HTTP method.
-Router.prototype.get = function(path = "/", callback = (request, response, next) => {}, ...callbacks) {
-    this.register(HTTP_METHOD.GET, path, callback, callbacks);
-}
+Router.prototype.get = function(
+  path = "/",
+  callback = (request, response, next) => {},
+  ...callbacks
+) {
+  this.register(HTTP_METHOD.GET, path, callback, callbacks);
+};
 
 // Register under specified HTTP method.
-Router.prototype.head = function(path = "/", callback = (request, response, next) => {}, ...callbacks) {
-    this.register(HTTP_METHOD.HEAD, path, callback, callbacks);
-}
+Router.prototype.head = function(
+  path = "/",
+  callback = (request, response, next) => {},
+  ...callbacks
+) {
+  this.register(HTTP_METHOD.HEAD, path, callback, callbacks);
+};
 
 // Register under specified HTTP method.
-Router.prototype.post = function(path = "/", callback = (request, response, next) => {}, ...callbacks) {
-    this.register(HTTP_METHOD.POST, path, callback, callbacks);
-}
+Router.prototype.post = function(
+  path = "/",
+  callback = (request, response, next) => {},
+  ...callbacks
+) {
+  this.register(HTTP_METHOD.POST, path, callback, callbacks);
+};
 
 // Register under specified HTTP method.
-Router.prototype.put = function(path = "/", callback = (request, response, next) => {}, ...callbacks) {
-    this.register(HTTP_METHOD.PUT, path, callback, callbacks);
-}
+Router.prototype.put = function(
+  path = "/",
+  callback = (request, response, next) => {},
+  ...callbacks
+) {
+  this.register(HTTP_METHOD.PUT, path, callback, callbacks);
+};
 
 // Register under specified HTTP method.
-Router.prototype.delete = function(path = "/", callback = (request, response, next) => {}, ...callbacks) {
-    this.register(HTTP_METHOD.DELETE, path, callback, callbacks);
-}
+Router.prototype.delete = function(
+  path = "/",
+  callback = (request, response, next) => {},
+  ...callbacks
+) {
+  this.register(HTTP_METHOD.DELETE, path, callback, callbacks);
+};
 
 // Handle a user request. Done is called when router completes middleware stack execution.
-Router.prototype.handle = function(request, response, done = (err) => {
-  if(err) { console.error(err); }
-}) {
+Router.prototype.handle = function(
+  request,
+  response,
+  done = err => {
+    if (err) {
+      console.error(err);
+    }
+  }
+) {
   if (!request || !response) {
     // If missing data, call to function was malformed.
     done(new Error("Function called improperly. Fatal server error."));
   } else {
-
     // Add parsed URL to the request object.
     request.parsedUrl = url.parse(request.url);
     const router = request.router;
@@ -228,9 +232,8 @@ Router.prototype.handle = function(request, response, done = (err) => {
       err = null,
       stackPosition = -1,
       errorPosition = -1
-    ) {        
-
-        console.dir(router);
+    ) {
+      console.dir(router);
 
       const requestHandler = router.getRequestHandlerAt(stackPosition);
       const errorHandler = router.getErrorHandlerAt(errorPosition);
@@ -326,4 +329,5 @@ Router.prototype.handle = function(request, response, done = (err) => {
   }
 };
 
+// Export class.
 module.exports = Router;

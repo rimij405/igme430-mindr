@@ -1,0 +1,16 @@
+{
+    "status": {
+        "200": {
+            "id": "OK",
+            "message": "Standard response for successful HTTP requests."
+        },
+        "201": {
+            "id": "Created",
+            "message": "The request has been fulfilled, resulting in the creation of a new resource."
+        },
+        "204": {
+            "id": "No Content",
+            "message": "The server successfully processed the request and is not returning any content."
+        }
+    }
+}

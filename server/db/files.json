@@ -1,0 +1,20 @@
+{
+    "files": {
+        "index": { 
+            "dir": "/client/public/",
+            "name": "index.html"
+        },
+        "entry": {
+            "dir": "/client/dist/",
+            "name": "main.js"
+        },
+        "main": {
+            "dir": "/client/public/css",
+            "name": "main.css"
+        },        
+        "style": {
+            "dir": "/client/public/css",
+            "name": "style.css"
+        }
+    }
+}

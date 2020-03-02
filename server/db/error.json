@@ -1,0 +1,36 @@
+{
+    "error": {
+        "400": {
+            "id": "Bad Request",
+            "message": "The server cannot or will not process the request due to an apparent client error (eg., malformed request syntax, size too large, invalid request message framing, or deceptive request routing)."
+        },
+        "401": {
+            "id": "Unauthorized",
+            "message": "Authentication is required and has failed or has not yet been provided."
+        },
+        "403": {
+            "id": "Forbidden",
+            "message": "The request contained valid data and was understood by the server, but the server is refusing action. The request should not be repeated."
+        },
+        "404": {
+            "id": "Not Found",
+            "message": "The requested resource could not be found but may be available in the future. Subsequent requests by the client are permissible."
+        },
+        "405": {
+            "id": "Method Not Allowed",
+            "message": "The request method is not supported for the requested resource (eg., a GET request on a form that requires data to be presented via POST, or a PUT request on a read-only resource."
+        },
+        "406": {
+            "id": "Not Acceptable",
+            "message": "The requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request."
+        },
+        "500": {
+            "id": "Internal Server Error",
+            "message": "An unexpected error occured on the server. Please notify the system administrator."
+        },
+        "501": {
+            "id": "Not Implemented",
+            "message": "The server either does not recognize the request method, or it lacks the ability to fulfill the request."
+        }
+    }
+}
