@@ -233,8 +233,7 @@ Router.prototype.handle = function(
       stackPosition = -1,
       errorPosition = -1
     ) {
-      console.dir(router);
-
+      
       const requestHandler = router.getRequestHandlerAt(stackPosition);
       const errorHandler = router.getErrorHandlerAt(errorPosition);
       index = stackPosition;

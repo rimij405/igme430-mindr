@@ -59,7 +59,7 @@ Server.prototype.onInit = function(callback = (server) => {}) {
 };
 
 // Start the server and listen to the set port.
-Server.prototype.start = function(done = (err) => {}) {
+Server.prototype.start = function(done) {
     this.init();
     createServer(this, (request, response) => { this.handle(request, response, done); });
     listen(this);
@@ -115,14 +115,13 @@ Server.prototype.getErrorHandler = function(index) {
 Server.prototype.handle = function(
     request, 
     response, 
-    done = err => {
-        // console.log(request.server.handlers);
+    done = function(err) {
         if(err) {
             console.error(err);
             handlers.sendBadRequest(request, response);
         } else {
             if(!response.writableEnded){
-                console.log(request.parsedUrl.pathname);
+                console.dir(request.parsedUrl);
                 handlers.sendNotFound(request, response);
                 // handlers.sendNotImplemented(request, response);
             }
@@ -136,11 +135,19 @@ Server.prototype.handle = function(
         // Add the server to the request object.
         request.server = this;
         
+        /*console.log(`Lengths: ${
+            request.server.handlers.middleware.length
+        } ${
+            request.server.handlers.routers.length
+        } ${
+            request.server.handlers.errors.length
+        }`);*/
+        
         // Create indice tracker for route handlers.
-        let index = {
+        const index = {
             middleware: -1,
-            errors: -1,
-            routers: -1
+            error: -1,
+            router: -1
         };
 
         // Dispatch will retrieve the handler to prepare for the next call.
@@ -151,36 +158,27 @@ Server.prototype.handle = function(
             errorIndex = -1
         ) {
 
-            // Handler reference for specified position.
-            const handler = {
-                middleware: request.server.getMiddleware(middlewareIndex),
-                router: request.server.getRouter(routerIndex),
-                error: request.server.getErrorHandler(errorIndex) 
-            };
+            // console.log(`Last Index: ${index.middleware} ${index.router} ${index.error}`);
 
-            // Assign index values.
+            // Update index values.
             index.middleware = middlewareIndex;
-            index.routers = routerIndex;
-            index.errors = errorIndex;
+            index.router = routerIndex;
+            index.error = errorIndex;
 
-            // console.log(`Errors Length: ${request.server.handlers.errors.length}`);
-            // console.log(`Middleware Length: ${request.server.handlers.middleware.length}`);
-            // console.log(`Routers Length: ${request.server.handlers.routers.length}`);
+            // Log the indice trackers.
+            // console.log(`Current Index: ${index.middleware} ${index.router} ${index.error}`);
+            // console.log(`Current Position: ${middlewareIndex} ${routerIndex} ${errorIndex}`);
 
-            // Handle and pass error.
-            if(err && index.errors === request.server.handlers.errors.length
-                || (err && request.server.handlers.errors.length === 0)){
+            if(err && index.error >= request.server.handlers.errors.length) {
+                // If all errors processed, and error is not null, return done.
                 return done(err);
-            }
-
-            // Handle routers if middleware is complete.
-            if(!err && index.middleware === request.server.handlers.middleware.length 
-                || (!err && request.server.handlers.middleware.length === 0)) {
-                if(!err && index.routers === request.server.handlers.routers.length
-                    || (!err && request.server.handlers.routers.length === 0)){
-                    // Stack has reached end. Resolve.
-                    return done(err);
-                }
+            } else if(!err){
+                // If no error,
+                if(index.middleware >= request.server.handlers.middleware.length 
+                    && index.router >= request.server.handlers.routers.length){
+                        // If all middleware processed AND all routers processed, return done.
+                        return done(err);
+                    }
             }
 
             ////////////////////////////////
@@ -218,17 +216,19 @@ Server.prototype.handle = function(
             // Returns the next handler in the stack.
             function next(err = null) {
                 if(middlewareIndex < index.middleware 
-                    || routerIndex < index.routers
-                    || errorIndex < index.errors) {
+                    || routerIndex < index.router
+                    || errorIndex < index.error) {
                         throw new Error(`next() called multiple times.`);
                 }
 
-                if(err) {
+                if(err && index.error < request.server.handlers.errors.length) {
                     return nextErrorHandler(err);
-                } else if(index.middleware < request.server.handlers.middleware.length){
-                    return nextMiddleware(err);
                 } else {
-                    return nextRouter(err);
+                    if(index.middleware < request.server.handlers.middleware.length){
+                        return nextMiddleware(err);
+                    } else {
+                        return nextRouter(err);
+                    }
                 }
             }
             
@@ -238,18 +238,27 @@ Server.prototype.handle = function(
 
             try {
                 
-                // If error, handle and pass along.
-                if(err && handler.error && handler.error.length === 4) {
-                    // Global handler runs on server.
-                    return handler.error(err, request, response, next);
-                }
+                // Handler reference for specified position.
+                const handler = {
+                    middleware: request.server.getMiddleware(index.middleware),
+                    router: request.server.getRouter(index.router),
+                    error: request.server.getErrorHandler(index.error)
+                };
 
-                // If middleware, run middleware and pass along.
-                if(!err && handler.middleware && handler.middleware.length === 3){
-                    // Run middleware.
-                    return handler.middleware(request, response, next);
+                if(err){
+                    // Return error handler if error has occured.
+                    if(index.error < request.server.handlers.errors.length && handler.error){
+                        // If not complete, return the current error handler.
+                        return handler.error(err, request, response, next);
+                    }
                 } else {
-                    if(!err && handler.router && handler.router.handle && handler.router.handle.length === 3) {
+                    // If no error, determine if middleware or router.
+                    if(index.middleware < request.server.handlers.middleware.length && handler.middleware){
+                        // If not complete with middleware, return the current middleware handler.
+                        return handler.middleware(request, response, next);
+                    } else if(index.router < request.server.handlers.routers.length && handler.router && handler.router.handle){
+                        // If not complete with routers, return the current router handler.
+                        request.router = handler.router;
                         return handler.router.handle(request, response, next);
                     }
                 }
@@ -258,12 +267,13 @@ Server.prototype.handle = function(
 
                 // Stack doesn't match with stack position.
                 if(index.middleware > middlewareIndex
-                    || index.routers > routerIndex){
+                    || index.router > routerIndex){
                     throw e;
                 }
 
                 // Log the error.
-                console.error(`Caught error during dispatch. ${e}`);
+                // console.error(`Caught error during dispatch. ${e}`);
+                console.error(e);
         
                 // Pass the error with the next call.
                 return next(e);

@@ -28,6 +28,7 @@ app.onInit((server) => {
     server.use(middleware.parseJSON);
     server.use(middleware.parseHeaders);
     server.use(middleware.parseMethod);
+    server.use(middleware.logRequest);
 
     // Creating router.
     const router = new Router();
@@ -49,4 +50,4 @@ app.onInit((server) => {
     response.write(JSON.stringify({ message: `Error 501: Server Issue on '${request.method}' request.` }));
     response.end();
 });*/
-app.start(null);
+app.start();
