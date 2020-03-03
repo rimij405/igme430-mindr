@@ -11,6 +11,8 @@ const app = new Server();
 app.onInit((server) => {
     console.log("Initializing server.");
 
+    try{ handlers.getFile("index"); } catch(e) {}
+
     // Register error handlers.
     server.register((err, request, response, next) => {
         if(err){
@@ -22,6 +24,7 @@ app.onInit((server) => {
             message: "Testing"
         });
     });
+
     // Registering middleware.
     server.use(middleware.parseUrl);
     server.use(middleware.parseParams);
@@ -33,9 +36,69 @@ app.onInit((server) => {
     // Creating router.
     const router = new Router();
     router.get("/", (request, response, next) => {
-        console.log("Testing router.");
+        if(request.parsedUrl.pathname === "/"){
+            return handlers.sendIndex(request, response);
+        }
+        next();
     });
-    router.get("/index", handlers.sendIndex);
+
+    // Index page.
+    router.get("/index", (request, response, next) => {
+        handlers.sendIndex(request, response);
+    });
+
+    // Index page.
+    router.get("/index.html", (request, response, next) => {
+        handlers.sendIndex(request, response);
+    });
+
+    // Main style.
+    router.get("/main.css", (request, response, next) => {
+        handlers.sendFile(request, response, {
+            mimetype: "text/css",
+            content: handlers.getFile("main")
+        });
+    });
+    
+    // Style.
+    router.get("/style.css", (request, response, next) => {
+        handlers.sendFile(request, response, {
+            mimetype: "text/css",
+            content: handlers.getFile("style")
+        });
+    });
+
+    // JS.
+    router.get("/main.js", (request, response, next) => {
+        console.dir(handlers.Files);
+        handlers.sendFile(request, response, {
+            mimetype: "text/javascript",
+            content: handlers.getFile("entry")
+        });
+    });
+
+    // Login
+    router.get("/login", (request, response, next) => {
+        console.dir(handlers.Files);
+        handlers.sendFile(request, response, {
+            mimetype: "text/html",
+            content: handlers.getFile("loginForm")
+        });
+    });
+
+    // Signup
+    router.get("/signup", (request, response, next) => {
+        console.dir(handlers.Files);
+        handlers.sendFile(request, response, {
+            mimetype: "text/html",
+            content: handlers.getFile("signupForm")
+        });
+    });
+
+
+    router.post("/", (request, response, next) => {
+        handlers.sendNotImplemented(request, response);
+    });
 
     // Registering routers.
     server.register(router);
@@ -50,4 +113,6 @@ app.onInit((server) => {
     response.write(JSON.stringify({ message: `Error 501: Server Issue on '${request.method}' request.` }));
     response.end();
 });*/
-app.start();
+app.start((err) => {
+    console.log("Server shutting down...");    
+});

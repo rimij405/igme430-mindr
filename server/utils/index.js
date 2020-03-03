@@ -1,8 +1,8 @@
 // General Utility export.
 module.exports = {
-    methods: require('./methods.js'),
-    logger: require('./logger-util.js'),
-    model: require('./model-util.js'),
-    regex: require('./regex-util.js'),
-    array: require('./array-util.js')
-}
+  methods: require('./methods.js'),
+  logger: require('./logger-util.js'),
+  model: require('./model-util.js'),
+  regex: require('./regex-util.js'),
+  array: require('./array-util.js'),
+};

@@ -1,36 +1,162 @@
-const url = require("url");
-const HTTP_METHOD = require("./../utils").methods;
-const ArrayUtil = require("./../utils").array;
-const Route = require("./route.js");
+// Import statements.
+const handlers = require('./../handlers');
+const Route = require('./route.js');
 
-///////////////////
+const { RequestHandler, RequestHandlerChain } = handlers;
+const HTTP_METHOD = require('./../utils').methods;
+
+// /////////////////
 // HELPER METHODS
-///////////////////
+// /////////////////
+
+
+// //////////////////
+// RouteHandler CLASS
+// //////////////////
+
+// Special route handler.
+function RouteHandler(method = '*', path = '*', callback = (request, response) => {}) {
+  this.route = new Route(method, path);
+  this.requestHandler = new RequestHandler(callback);
+}
+
+// Wrapper for isMethod verification.
+RouteHandler.prototype.isMethod = function (method) {
+  return (this.route && this.route.isMethod(method));
+};
+
+// Wrapper for isPath verification.
+RouteHandler.prototype.isPath = function (path) {
+  return (this.route && this.route.isPath(path));
+};
+
+// Activate request handler on call.
+RouteHandler.prototype.handle = function (request, response, next) {
+  // Determine if current method and path matches.
+  if (this.isMethod(request.method) && this.isPath((request.parsedUrl) ? request.parsedUrl.pathname : '*')) {
+    return this.requestHandler.handle(request, response, next);
+  }
+  return next();
+};
+
+// //////////////////
+// Router CLASS
+// //////////////////
+
+// The Router maintains a stack of middleware functions.
+function Router(router) {
+  // Routes.
+  this.routes = (router) ? router.routes : new RequestHandlerChain();
+
+  // Errors.
+  this.errors = (router) ? router.errors : new RequestHandlerChain();
+}
+
+// Register route handlers.
+Router.prototype.register = function (
+  method = '*',
+  path = '*',
+  handler = (request, response, next) => {},
+) {
+  if (handler && typeof handler === 'function') {
+    if (handler.length === 4) {
+      this.errors.register(new RouteHandler(method, path, handler));
+    } else {
+      this.routes.register(new RouteHandler(method, path, handler));
+    }
+  }
+};
+
+// Register middleware.
+Router.prototype.use = function (handler = (request, response, next) => {}) {
+  this.routes.register(handler);
+};
+
+// Get methods.
+Router.prototype.get = function (path = '*', handler = (request, response, next) => {}) {
+  this.register(HTTP_METHOD.GET, path, handler);
+};
+
+// Head methods.
+Router.prototype.head = function (path = '*', handler = (request, response, next) => {}) {
+  this.register(HTTP_METHOD.HEAD, path, handler);
+};
+
+// Post methods.
+Router.prototype.post = function (path = '*', handler = (request, response, next) => {}) {
+  this.register(HTTP_METHOD.POST, path, handler);
+};
+
+// Put methods.
+Router.prototype.put = function (path = '*', handler = (request, response, next) => {}) {
+  this.register(HTTP_METHOD.PUT, path, handler);
+};
+
+// Handle the requests.
+Router.prototype.handle = function (request, response, done = (err) => {}) {
+  const routeHandlers = this.routes;
+  const errorHandlers = this.errors;
+
+  // If routes exist.
+  if (routeHandlers && routeHandlers.getChainLength() > 0) {
+    console.log(request.method);
+    routeHandlers.handle(request, response, (err) => {
+      if (err) {
+        errorHandlers.handle(request, response, () => {
+          done(err);
+        });
+      } else {
+        if (!response.writableEnded) {
+          if (request.method === HTTP_METHOD.GET
+                  || request.method === HTTP_METHOD.HEAD) {
+            return handlers.sendNotFound(request, response);
+          }
+          return handlers.sendNotImplemented(request, response);
+        }
+        done();
+      }
+    });
+  }
+};
+
+// Export functions.
+module.exports = {
+  Router,
+  RouteHandler,
+};
+
+
+// const url = require("url");
+// const HTTP_METHOD = require("./../utils").methods;
+// const ArrayUtil = require("./../utils").array;
+// const Route = require("./route.js");
+
+
+// /////////////////
+// HELPER METHODS
+// /////////////////
 
 /*
 const routes = {
     "/": sendIndex,
     "/index.html": sendIndex,
-    "/main.js": (request, response) => { 
+    "/main.js": (request, response) => {
         sendFile(request, response, 'text/javascript', entry);
     },
-    "/main.css": (request, response) => { 
+    "/main.css": (request, response) => {
         sendFile(request, response, 'text/css', main);
     },
-    "/style.css": (request, response) => { 
+    "/style.css": (request, response) => {
         sendFile(request, response, 'text/css', style);
     },
-};*/
+}; */
 
-////////////////////
-// RequestHandlerStack CLASS
-////////////////////
-
+/*
 // Create a request handler stack.
 function RequestHandlerStack(collection = null) {
   if (collection && Array.isArray(collection)) {
     this.stack = ArrayUtil.copy(collection);
-    if (collection instanceof RequestHandStack) {
+    if (collection instanceof RequestHandlerStack) {
       this.stack = ArrayUtil.copy(collection.stack);
     } else {
       this.stack = [];
@@ -233,7 +359,7 @@ Router.prototype.handle = function(
       stackPosition = -1,
       errorPosition = -1
     ) {
-      
+
       const requestHandler = router.getRequestHandlerAt(stackPosition);
       const errorHandler = router.getErrorHandlerAt(errorPosition);
       index = stackPosition;
@@ -330,3 +456,4 @@ Router.prototype.handle = function(
 
 // Export class.
 module.exports = Router;
+*/

@@ -9,12 +9,20 @@
             "name": "main.js"
         },
         "main": {
-            "dir": "/client/public/css",
+            "dir": "/client/public/css/",
             "name": "main.css"
         },        
         "style": {
-            "dir": "/client/public/css",
+            "dir": "/client/public/css/",
             "name": "style.css"
+        },
+        "loginForm": {
+            "dir": "/client/public/views/",
+            "name": "login.html"
+        },
+        "signupForm": {
+            "dir": "/client/public/views/",
+            "name": "signup.html"
         }
     }
 }

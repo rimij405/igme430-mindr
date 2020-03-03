@@ -2,10 +2,14 @@
 
 const doc = document;
 
-const createElement = () => {
-    const element = doc.createElement('div');
-    element.innerText = "This should be red.";
-    element.classList.add('hello');
+const createElement = (tag, content, classes = []) => {
+    const element = doc.createElement(tag);
+    element.innerText = content;
+    if(classes){
+        classes.forEach((classItem) => {
+            element.classList.add(classItem);
+        });
+    }
     return element;
 };
 
@@ -14,9 +18,7 @@ const addElement = (e) => {
 };
 
 const init = () => {
-    console.log("Window initialized.");
-    addElement(createElement());
-    console.log("Testing after build.");
+    
 };
 
 window.onload = init;
